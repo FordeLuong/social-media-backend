@@ -19,8 +19,7 @@ app.post("/api/register", async (req, res) => {
         return res.status(409).json({ message: "Username hoặc Email đã tồn tại!" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    users.push({ fullName, username, email, password: hashedPassword });
+    users.push({ fullName, username, email, password});
 
     console.log(users);
 
