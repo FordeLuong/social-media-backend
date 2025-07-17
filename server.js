@@ -41,5 +41,10 @@ app.post("/api/login", (req, res) => {
     }
 })
 
+app.get("/", (req, res) => {
+  res.send("🚀 Backend is running. Use POST /api/register or /api/login.");
+});
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Server is running on port ${PORT}`));
