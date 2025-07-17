@@ -8,9 +8,17 @@ app.use(express.json());
 let user = [];
 
 app.post("/api/register", (req, res) => {
-    const user = req.body;
-    users.push(user);
-    res.status(201).json({ message: "Đăng kí thành công", user });
+    const {fullName, username, email, password} = req.body;
+    
+    if (!fullName || !username || !email || !password) {
+    return res.status(400).json({ message: "Thiếu thông tin!" });
+    }
+
+    users.push({ fullName, username, email, password });
+    console.log(users);
+
+
+    res.status(201).json({ message: "Đăng kí thành công", user: {fullName, username, email} });
 });
 
 app.post("/api/login", (req, res) => {
