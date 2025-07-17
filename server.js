@@ -5,7 +5,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-let user = [];
+let users = [];
 
 app.post("/api/register", async (req, res) => {
     const { fullName, username, email, password } = req.body;
