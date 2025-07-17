@@ -1,11 +1,12 @@
 const express = require("express");
 const cors = require("cors");
+const bcrypt = require("bcrypt");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-let user = [];
+let users = [];
 
 app.post("/api/register", async (req, res) => {
     const { fullName, username, email, password } = req.body;
@@ -27,19 +28,21 @@ app.post("/api/register", async (req, res) => {
     res.status(201).json({ message: "Đăng ký thành công", user: { fullName, username, email } });
 });
 
-app.post("/api/login", (req, res) => {
+app.post("/api/login", async (req, res) => {
     const { username, password } = req.body;
-    const user = user.find(
-        (u) => u.username === username && u.password === password
-    );
-    // Có user 
-    if (user) {
-        res.json({ message: "Đăng nhập thành công", user });
-    // Không có user
-    } else {
-        res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu" });
+
+    const user = users.find(u => u.username === username);
+    if (!user) {
+        return res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu" });
     }
-})
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+        return res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu" });
+    }
+
+    res.json({ message: "Đăng nhập thành công", user: { fullName: user.fullName, username: user.username, email: user.email } });
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Server is running on port ${PORT}`));
