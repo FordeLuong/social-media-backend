@@ -1,49 +1,39 @@
-const express = require("express");
-const cors = require("cors");
-const app = express();
+// server.js
 
-app.use(cors());
+const express = require('express');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+
+dotenv.config();
+const app = express();
 app.use(express.json());
 
-let users = [];
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('MongoDB connected successfully!');
+  } catch (error) {
+    console.error('MongoDB connection failed:', error.message);
+    process.exit(1);
+  }
+};
 
-app.post("/api/register", async (req, res) => {
-    const { fullName, username, email, password } = req.body;
+connectDB();
 
-    if (!fullName || !username || !email || !password) {
-        return res.status(400).json({ message: "Thiếu thông tin!" });
-    }
-
-    const exists = users.find(u => u.username === username || u.email === email);
-    if (exists) {
-        return res.status(409).json({ message: "Username hoặc Email đã tồn tại!" });
-    }
-
-    users.push({ fullName, username, email, password});
-
-    console.log(users);
-
-    res.status(201).json({ message: "Đăng ký thành công", user: { fullName, username, email } });
+// --- ĐỊNH NGHĨA ROUTES ---
+app.get('/', (req, res) => {
+  res.send('API is running...');
 });
 
-app.post("/api/login", (req, res) => {
-    const { username, password } = req.body;
-    const user = users.find(
-        (u) => u.username === username && u.password === password
-    );
-    // Có user 
-    if (user) {
-        res.json({ message: "Đăng nhập thành công", user });
-    // Không có user
-    } else {
-        res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu" });
-    }
-})
+// Sử dụng authRoutes cho các đường dẫn bắt đầu bằng /api/auth
+app.use('/api/auth', require('./routes/authRoutes.js'));
 
-app.get("/", (req, res) => {
-  res.send("🚀 Backend is running. Use POST /api/register or /api/login.");
-});
+// Sử dụng userRoutes cho các đường dẫn bắt đầu bằng /api/users
+app.use('/api/users', require('./routes/userRoutes.js'));
 
 
+// --- KHỞI ĐỘNG SERVER ---
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`✅ Server is running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
