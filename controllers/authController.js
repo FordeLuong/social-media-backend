@@ -2,7 +2,6 @@
 
 const User = require('../models/userModel.js');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs'); // Cần bcrypt để so sánh mật khẩu
 
 // Hàm tạo token để tái sử dụng
 const generateToken = (id) => {
@@ -14,22 +13,25 @@ const generateToken = (id) => {
 // @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
+// Phần Đăng ký không cần thay đổi, vẫn yêu cầu cả username, email, password
 const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
-    // Kiểm tra các trường bắt buộc
     if (!username || !email || !password) {
       return res.status(400).json({ msg: 'Please provide all fields' });
     }
 
-    // Kiểm tra user đã tồn tại chưa
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ $or: [{ email }, { username }] });
     if (userExists) {
-      return res.status(400).json({ msg: 'User already exists' });
+        if(userExists.email === email) {
+            return res.status(400).json({ msg: 'Email already exists' });
+        }
+        if(userExists.username === username) {
+            return res.status(400).json({ msg: 'Username already exists' });
+        }
     }
-
-    // Tạo user mới (mật khẩu sẽ được hash tự động bởi pre-save hook trong model)
+    
     const user = await User.create({
       username,
       email,
@@ -41,7 +43,7 @@ const registerUser = async (req, res) => {
         _id: user._id,
         username: user.username,
         email: user.email,
-        token: generateToken(user._id), // Trả về token ngay khi đăng ký
+        token: generateToken(user._id),
       });
     } else {
       res.status(400).json({ msg: 'Invalid user data' });
@@ -52,15 +54,17 @@ const registerUser = async (req, res) => {
   }
 };
 
+
 // @desc    Authenticate a user
 // @route   POST /api/auth/login
 // @access  Public
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  // --- THAY ĐỔI 1: Lấy `username` và `password` từ body ---
+  const { username, password } = req.body;
 
   try {
-    // Tìm user bằng email
-    const user = await User.findOne({ email });
+    // --- THAY ĐỔI 2: Tìm user bằng `username` thay vì `email` ---
+    const user = await User.findOne({ username });
 
     // Nếu user tồn tại VÀ mật khẩu khớp
     if (user && (await user.matchPassword(password))) {
@@ -71,9 +75,11 @@ const loginUser = async (req, res) => {
         token: generateToken(user._id),
       });
     } else {
-      res.status(401).json({ msg: 'Invalid email or password' });
+      // --- THAY ĐỔI 3: Cập nhật thông báo lỗi cho rõ ràng ---
+      res.status(401).json({ msg: 'Invalid username or password' });
     }
-  } catch (error) {
+  } catch (error)
+  {
     console.error(error);
     res.status(500).json({ msg: 'Server Error' });
   }
