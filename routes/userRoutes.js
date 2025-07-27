@@ -9,4 +9,9 @@ const auth = require('../middleware/auth.js');
 // Client phải gửi token hợp lệ mới truy cập được
 router.get('/me', auth, getMe);
 
+
+// Route để lấy thông tin của một user bất kỳ theo ID
+// ':id' là một tham số động (dynamic parameter)
+router.get('/:id', getUserById);
+
 module.exports = router;
