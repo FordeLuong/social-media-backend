@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { getMe } = require('../controllers/userController.js');
+const { getMe, getUserById } = require('../controllers/userController.js');
 const auth = require('../middleware/auth.js');
 
 // Route này được bảo vệ bởi middleware 'auth'
