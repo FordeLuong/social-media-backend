@@ -11,25 +11,24 @@ const {
   likePost,
   commentOnPost,
 } = require('../controllers/postController');
-const { protect } = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 
-// POST /api/posts -> Tạo bài đăng mới (Cần đăng nhập)
-router.route('/').post(protect, createPost);
-
-// GET /api/posts -> Lấy tất cả bài đăng (Công khai)
-router.route('/').get(getAllPosts);
+router
+  .route('/')
+  .get(getAllPosts)
+  .post(auth, createPost);
 
 // Các route liên quan đến một bài đăng cụ thể bằng ID
 router
   .route('/:id')
   .get(getPostById) // GET /api/posts/:id -> Lấy 1 bài đăng (Công khai)
-  .put(protect, updatePost) // PUT /api/posts/:id -> Sửa bài đăng (Chỉ chủ bài đăng)
-  .delete(protect, deletePost); // DELETE /api/posts/:id -> Xóa bài đăng (Chỉ chủ bài đăng)
+  .put(auth, updatePost) // PUT /api/posts/:id -> Sửa bài đăng (Chỉ chủ bài đăng)
+  .delete(auth, deletePost); // DELETE /api/posts/:id -> Xóa bài đăng (Chỉ chủ bài đăng)
 
 // PUT /api/posts/:id/like -> Like/unlike bài đăng (Cần đăng nhập)
-router.route('/:id/like').put(protect, likePost);
+router.route('/:id/like').put(auth, likePost);
 
 // POST /api/posts/:id/comment -> Bình luận (Cần đăng nhập)
-router.route('/:id/comment').post(protect, commentOnPost);
+router.route('/:id/comment').post(auth, commentOnPost);
 
 module.exports = router;

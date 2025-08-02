@@ -1,39 +1,27 @@
-// middleware/auth.js
-
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel.js');
+const asyncHandler = require('express-async-handler');
+const User = require('../models/userModel');
 
-const auth = async (req, res, next) => {
-  let token;
+// Middleware xác thực người dùng
+const auth = asyncHandler(async (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-  // Client sẽ gửi token trong header Authorization theo dạng 'Bearer <token>'
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+  // Kiểm tra nếu có token theo chuẩn Bearer
+  if (authHeader && authHeader.startsWith('Bearer')) {
+    const token = authHeader.split(' ')[1];
+
     try {
-      // 1. Lấy token ra khỏi header (Bỏ đi chữ 'Bearer ')
-      token = req.headers.authorization.split(' ')[1];
-
-      // 2. Giải mã token để lấy payload (chứa id của user)
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      // 3. Tìm user trong DB bằng id từ token và gắn vào request
-      // Dùng .select('-password') để không lấy trường password về
-      req.user = await User.findById(decoded.user.id).select('-password');
-
-      if (!req.user) {
-        return res.status(401).json({ msg: 'User not found, authorization denied' });
-      }
-
-      // 4. Cho phép request đi tiếp
+      req.user = await User.findById(decoded.id).select('-password'); // bỏ mật khẩu khi gán user
       next();
     } catch (error) {
-      console.error(error);
-      res.status(401).json({ msg: 'Token is not valid' });
+      res.status(401);
+      throw new Error('Token không hợp lệ');
     }
+  } else {
+    res.status(401);
+    throw new Error('Không có token, truy cập bị từ chối');
   }
+});
 
-  if (!token) {
-    res.status(401).json({ msg: 'No token, authorization denied' });
-  }
-};
-
-module.exports = auth;
+module.exports = { auth };
