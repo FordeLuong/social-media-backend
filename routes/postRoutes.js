@@ -11,7 +11,7 @@ const {
   likePost,
   commentOnPost,
 } = require('../controllers/postController');
-const { auth } = require('../middleware/auth');
+const auth = require('../middleware/auth');
 
 router
   .route('/')
