@@ -19,7 +19,7 @@ exports.createPost = async (req, res) => {
 
     const newPost = new Post({
       content,
-      author: req.user.id, // req.user được lấy từ middleware `protect`
+      author: req.user.id, // req.user được lấy từ middleware 
     });
 
     const savedPost = await newPost.save();
