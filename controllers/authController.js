@@ -15,6 +15,12 @@ const generateToken = (id) => {
 // @access  Public
 // Phần Đăng ký không cần thay đổi, vẫn yêu cầu cả username, email, password
 const registerUser = async (req, res) => {
+  console.log('=== DEBUG INFO ===');
+  console.log('req.method:', req.method);
+  console.log('req.headers:', req.headers);
+  console.log('req.body:', req.body);
+  console.log('typeof req.body:', typeof req.body);
+  console.log('==================');
   const { username, email, password } = req.body;
 
   try {
