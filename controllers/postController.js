@@ -209,3 +209,30 @@ exports.deletePost = async (req, res) => {
     res.status(500).json({ message: 'Lỗi server' });
   }
 };
+
+// @desc    Lấy tất cả bài đăng của một người dùng cụ thể
+// @route   GET /api/users/:userId/posts
+// @access  Public
+exports.getUserPosts = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const posts = await Post.find({ author: userId })
+      .populate('author', 'username avatar')
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'author',
+          select: 'username avatar',
+        },
+      })
+      .sort({ createdAt: -1 });
+    if (!posts || posts.length === 0) {
+      return res.status(404).json({ message: 'Không tìm thấy bài đăng của người dùng này' });
+    }
+    res.status(200).json(posts); 
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Lỗi server' });
+  }
+}
