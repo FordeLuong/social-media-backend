@@ -16,6 +16,6 @@ router.get('/me', auth, getMe);
 router.get('/:id', getUserById);
 
 // Route để lấy tất cả bài đăng của một user theo ID
-router.route('/:userId/posts').get(getPostsByUserId);
+router.route('/:userId/posts').get(getUserPosts);
 
 module.exports = router;
