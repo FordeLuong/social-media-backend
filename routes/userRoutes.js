@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { getMe, getUserById } = require('../controllers/userController.js');
+const { getMe, getUserById, followUser, unfollowUser } = require('../controllers/userController.js');
 const { getUserPosts } = require('../controllers/postController.js');
 const auth = require('../middleware/auth.js');
 
