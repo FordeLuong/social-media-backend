@@ -19,7 +19,7 @@ router.get('/:id', getUserById);
 // Route để lấy tất cả bài đăng của một user theo ID
 router.route('/:userId/posts').get(getUserPosts);
 
-router.route('/:id/follow').post(protect, followUser);
-router.route('/:id/unfollow').post(protect, unfollowUser);
+router.route('/:id/follow').post(auth, followUser);
+router.route('/:id/unfollow').post(auth, unfollowUser);
 
 module.exports = router;
