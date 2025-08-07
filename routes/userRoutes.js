@@ -15,6 +15,7 @@ router.get('/me', auth, getMe);
 // ':id' là một tham số động (dynamic parameter)
 router.get('/:id', getUserById);
 
+// abc
 // Route để lấy tất cả bài đăng của một user theo ID
 router.route('/:userId/posts').get(getUserPosts);
 
