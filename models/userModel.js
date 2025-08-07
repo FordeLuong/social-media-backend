@@ -24,7 +24,15 @@ const UserSchema = new mongoose.Schema({
   avatar: {
     type: String,
     default: 'https://i.pravatar.cc/150' // Một avatar mặc định
-  }
+  },
+  followers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User' // Tham chiếu đến mô hình Flower
+  }],
+  following: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User' // Tham chiếu đến mô hình Flower  
+  }],
 }, {
   timestamps: true, // Tự động thêm 2 trường createdAt và updatedAt
 });
