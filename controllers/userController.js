@@ -33,8 +33,90 @@ const getUserById = async (req, res) => {
   }
 };
 
+// @desc    Follow một người dùng
+// @route   POST /api/users/:id/follow
+// @access  Private
+const followUser = async (req, res) => {
+  try {
+      // User để follow
+      const userToFollow = await User.findById(req.params.id);
+      // User hiện tại (người đi follow)
+      const currentUser = await User.findById(req.user.id);
+
+      if (!userToFollow || !currentUser) {
+          return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+      }
+
+      // Không cho phép follow chính mình
+      if (userToFollow._id.toString() === currentUser._id.toString()) {
+          return res.status(400).json({ message: 'Không thể follow chính mình.' });
+      }
+
+      // Kiểm tra xem đã follow chưa
+      if (currentUser.following.includes(userToFollow._id)) {
+          return res.status(400).json({ message: 'Bạn đã follow người dùng này.' });
+      }
+
+      // Thêm người dùng vào danh sách following của currentUser
+      currentUser.following.push(userToFollow._id);
+      // Thêm currentUser vào danh sách followers của userToFollow
+      userToFollow.followers.push(currentUser._id);
+
+      // Lưu cả hai user
+      await currentUser.save();
+      await userToFollow.save();
+
+      res.status(200).json({
+          message: 'Đã follow thành công.',
+          following: currentUser.following,
+          followers: userToFollow.followers
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+// @desc    Unfollow một người dùng
+// @route   POST /api/users/:id/unfollow
+// @access  Private
+const unfollowUser = async (req, res) => {
+  try {
+      const userToUnfollow = await User.findById(req.params.id);
+      const currentUser = await User.findById(req.user.id);
+      if (!userToUnfollow || !currentUser) {
+          return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+      }
+      // Không cho phép unfollow chính mình
+      if (userToUnfollow._id.toString() === currentUser._id.toString()) {
+          return res.status(400).json({ message: 'Không thể unfollow chính mình.' });
+      }
+      // Kiểm tra xem đã follow chưa
+      if (!currentUser.following.includes(userToUnfollow._id)) {
+          return res.status(400).json({ message: 'Bạn chưa follow người dùng này.' });
+      }
+      // Xóa người dùng khỏi danh sách following của currentUser
+      currentUser.following = currentUser.following.filter(id => id.toString() !== userToUnfollow._id.toString());
+      // Xóa currentUser khỏi danh sách followers của userToUnfollow
+      userToUnfollow.followers = userToUnfollow.followers.filter(id => id.toString() !== currentUser._id.toString());
+      // Lưu cả hai user
+      await currentUser.save();
+      await userToUnfollow.save();
+      res.status(200).json({
+          message: 'Đã unfollow thành công.',
+          following: currentUser.following,
+          followers: userToUnfollow.followers
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
 
 module.exports = {
   getMe,
   getUserById, 
+  followUser,
+  unfollowUser
 };
