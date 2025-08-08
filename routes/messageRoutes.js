@@ -10,7 +10,6 @@ const {
   getMessages,
   deleteMessage,
 } = require('../controllers/messageController');
-const auth = require('../middleware/auth');
 
 // --- Định nghĩa các Routes ---
 

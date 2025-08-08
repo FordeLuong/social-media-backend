@@ -9,7 +9,6 @@ const {
   createConversation,
   getConversations,
 } = require('../controllers/conversationController');
-const auth = require('../middleware/auth');
 
 // --- Định nghĩa các Routes ---
 
