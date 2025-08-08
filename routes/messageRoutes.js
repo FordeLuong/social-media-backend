@@ -15,7 +15,7 @@ const {
 
 // @route   POST /api/messages
 // Gửi một tin nhắn mới.
-router.route('/').post(protect, sendMessage);
+router.route('/').post(auth, sendMessage);
 
 // @route   GET /api/messages/:conversationId
 // Lấy tất cả tin nhắn của một cuộc trò chuyện.
