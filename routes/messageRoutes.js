@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middleware/auth'); // Import middleware bảo vệ
+const auth = require('../middleware/auth'); // Import middleware bảo vệ
 
 // Import các hàm controller
 const {
