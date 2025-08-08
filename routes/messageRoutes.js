@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middleware/auth'); // Import middleware bảo vệ
+const { auth } = require('../middleware/auth'); // Import middleware bảo vệ
 
 // Import các hàm controller
 const {
@@ -10,6 +10,7 @@ const {
   getMessages,
   deleteMessage,
 } = require('../controllers/messageController');
+const auth = require('../middleware/auth');
 
 // --- Định nghĩa các Routes ---
 
@@ -19,11 +20,11 @@ router.route('/').post(protect, sendMessage);
 
 // @route   GET /api/messages/:conversationId
 // Lấy tất cả tin nhắn của một cuộc trò chuyện.
-router.route('/:conversationId').get(protect, getMessages);
+router.route('/:conversationId').get(auth, getMessages);
 
 // @route   DELETE /api/messages/:messageId  (Lưu ý: :messageId ở đây)
 // Xóa một tin nhắn cụ thể (chỉ chủ tin nhắn mới có quyền).
 // Tôi giả sử param là messageId để rõ ràng hơn.
-router.route('/:messageId').delete(protect, deleteMessage);
+router.route('/:messageId').delete(auth, deleteMessage);
 
 module.exports = router;
