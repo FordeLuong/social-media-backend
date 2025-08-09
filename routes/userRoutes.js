@@ -6,25 +6,37 @@ const { getMe, getUserById, followUser, unfollowUser, updateUserProfile } = requ
 const { getUserPosts } = require('../controllers/postController.js');
 const auth = require('../middleware/auth.js');
 
-// Route này được bảo vệ bởi middleware 'auth'
-// Client phải gửi token hợp lệ mới truy cập được
+// --- CÁC ROUTE TĨNH (STATIC ROUTES) 
+
+// @route   GET /api/users/me
+// Lấy thông tin của người dùng đang đăng nhập
 router.get('/me', auth, getMe);
 
+// @route   PUT /api/users/profile
+// Cập nhật thông tin profile của người dùng đang đăng nhập
+router.put('/profile', auth, updateUserProfile);
 
-// Route để lấy thông tin của một user bất kỳ theo ID
-// ':id' là một tham số động (dynamic parameter)
+
+
+// --- CÁC ROUTE ĐỘNG (DYNAMIC ROUTES)
+
+// @route   GET /api/users/:id
+// Lấy thông tin của một user bất kỳ theo ID
 router.get('/:id', getUserById);
 
-// abc
-// Route để lấy tất cả bài đăng của một user theo ID
-router.route('/:userId/posts').get(getUserPosts);
+// @route   GET /api/users/:userId/posts
+// Lấy tất cả bài đăng của một user theo ID
+router.get('/:userId/posts', getUserPosts);
 
-router.route('/:id/follow').post(auth, followUser);
-router.route('/:id/unfollow').post(auth, unfollowUser);
-router.route('profile').put(auth, updateUserProfile);
+// @route   POST /api/users/:id/follow
+// Theo dõi một user
+router.post('/:id/follow', auth, followUser);
 
-// Route để cập nhật thông tin profile của người dùng hiện tại
-// Chỉ cho phép người dùng đã đăng nhập (bảo vệ bởi middleware 'auth')
-router.put('/me', auth, updateUserProfile);
+// @route   POST /api/users/:id/unfollow
+// Bỏ theo dõi một user
+router.post('/:id/unfollow', auth, unfollowUser);
+
+
+
 
 module.exports = router;
