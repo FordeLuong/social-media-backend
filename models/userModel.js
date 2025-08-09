@@ -10,6 +10,11 @@ const UserSchema = new mongoose.Schema({
     unique: true, // Tên người dùng là duy nhất
     trim: true,
   },
+  realName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
   email: {
     type: String,
     required: true,
@@ -24,6 +29,10 @@ const UserSchema = new mongoose.Schema({
   avatar: {
     type: String,
     default: 'https://i.pravatar.cc/150' // Một avatar mặc định
+  },
+  bio: { 
+    type: String, 
+    default: '', maxLength: 150 
   },
   followers: [{
     type: mongoose.Schema.Types.ObjectId,

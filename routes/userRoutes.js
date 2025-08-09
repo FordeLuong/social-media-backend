@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { getMe, getUserById, followUser, unfollowUser } = require('../controllers/userController.js');
+const { getMe, getUserById, followUser, unfollowUser, updateUserProfile } = require('../controllers/userController.js');
 const { getUserPosts } = require('../controllers/postController.js');
 const auth = require('../middleware/auth.js');
 
@@ -21,5 +21,10 @@ router.route('/:userId/posts').get(getUserPosts);
 
 router.route('/:id/follow').post(auth, followUser);
 router.route('/:id/unfollow').post(auth, unfollowUser);
+router.route('profile').put(auth, updateUserProfile);
+
+// Route để cập nhật thông tin profile của người dùng hiện tại
+// Chỉ cho phép người dùng đã đăng nhập (bảo vệ bởi middleware 'auth')
+router.put('/me', auth, updateUserProfile);
 
 module.exports = router;
