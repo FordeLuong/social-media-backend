@@ -19,7 +19,7 @@ const registerUser = async (req, res) => {
   console.log('typeof req.body:', typeof req.body);
   console.log('==================');
 
-  const { username, email, password } = req.body;
+  const { username, email, password, realName } = req.body;
 
   try {
     if (!username || !email || !password) {
@@ -40,6 +40,7 @@ const registerUser = async (req, res) => {
       username,
       email,
       password,
+      realName: realName || username, // Nếu không có realName thì dùng username làm mặc định
     });
 
     if (user) {
@@ -47,6 +48,7 @@ const registerUser = async (req, res) => {
         _id: user._id,
         username: user.username,
         email: user.email,
+        realName: user.realName,
         token: generateToken(user._id), // ✅ Token mới với { id }
       });
     } else {
@@ -72,6 +74,7 @@ const loginUser = async (req, res) => {
         _id: user._id,
         username: user.username,
         email: user.email,
+        realName: user.realName,
         token: generateToken(user._id), // ✅ Token mới với { id }
       });
     } else {

@@ -114,7 +114,7 @@ const unfollowUser = async (req, res) => {
 };
 
 const updateUserProfile = async (req, res) => {
-  const { username, email, bio } = req.body;
+  const { realName, avatar, bio } = req.body;
   try {
     const user = await User.findById(req.user.id);
 
@@ -123,7 +123,6 @@ const updateUserProfile = async (req, res) => {
     }
     // Cập nhật thông tin người dùng
     user.realName = realName || user.realName;
-    user.email = email || user.email;
     user.bio = bio || user.bio;
     user.avatar = req.file ? req.file.path : user.avatar; // Nếu có file avatar mới thì cập nhật
 
@@ -135,8 +134,9 @@ const updateUserProfile = async (req, res) => {
 
     res.status(200).json({
       _id: updatedUser._id,
-      realName: updatedUser.realName,
+      username: updatedUser.username,
       email: updatedUser.email,
+      realName: updatedUser.realName,
       bio: updatedUser.bio,
       avatar: updatedUser.avatar,
       followers: updatedUser.followers,
