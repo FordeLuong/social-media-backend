@@ -16,9 +16,11 @@ exports.createPost = async (req, res) => {
     if (!content) {
       return res.status(400).json({ message: 'Nội dung không được để trống' });
     }
+    const tempimageUrl = req.file ? req.file.path : null;
 
     const newPost = new Post({
       content,
+      imageUrl: tempimageUrl, // Lưu đường dẫn ảnh nếu có
       author: req.user.id, // req.user được lấy từ middleware 
     });
 

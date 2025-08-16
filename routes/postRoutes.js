@@ -12,11 +12,16 @@ const {
   commentOnPost,
 } = require('../controllers/postController');
 const auth = require('../middleware/auth');
+const upload = require('../config/cloudinary'); // Import middleware upload để xử lý file ảnh
+
+// Các route liên quan đến bài đăng
+// GET /api/posts -> Lấy tất cả bài đăng (Công khai)
+// POST /api/posts -> Tạo bài đăng mới (Cần đăng nhập)
 
 router
   .route('/')
   .get(getAllPosts)
-  .post(auth, createPost);
+  .post(auth, upload.single('image'), createPost);
 
 // Các route liên quan đến một bài đăng cụ thể bằng ID
 router
