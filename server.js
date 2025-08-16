@@ -13,8 +13,12 @@ const app = express();
 
 // --- CẤU HÌNH CORS ---
 
-const corsOptions = { origin: '*' }; // Cho phép tất cả nguồn gốc truy cập
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: "*", // Cho phép tất cả các nguồn gốc. Khi deploy thật, bạn nên thay bằng URL frontend
+  methods: ["GET", "POST", "PUT", "DELETE"], // Cho phép các phương thức này
+  allowedHeaders: ["Content-Type", "Authorization"], // Cho phép các header này
+}));
+
 app.use(express.json()); // Parse body của request thành JSON
 
 // --- KẾT NỐI DATABASE ---
