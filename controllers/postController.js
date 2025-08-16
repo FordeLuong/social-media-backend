@@ -13,10 +13,12 @@ exports.createPost = async (req, res) => {
   try {
     const { content } = req.body;
 
+    const imageFile = req.files && req.files.length > 0 ? req.files[0] : null;
+    const tempimageUrl = imageFile ? imageFile.path : null;
+
     if (!content) {
       return res.status(400).json({ message: 'Nội dung không được để trống' });
     }
-    const tempimageUrl = req.file ? req.file.path : null;
 
     const newPost = new Post({
       content,

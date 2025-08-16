@@ -21,7 +21,7 @@ const upload = require('../config/cloudinary'); // Import middleware upload đ�
 router
   .route('/')
   .get(getAllPosts)
-  .post(auth, upload.single('image'), createPost);
+  .post(auth, upload.any(), createPost);
 
 // Các route liên quan đến một bài đăng cụ thể bằng ID
 router
