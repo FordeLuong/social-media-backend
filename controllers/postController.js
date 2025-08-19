@@ -56,6 +56,8 @@ exports.createPostWithImage = async (req, res) => {
     res.status(201).json(savedPost);
   } catch (error) {
     console.error("Error in createPostWithImage:", error);
+    console.log("req.file:", req.file);
+    console.log("req.body:", req.body);
     res.status(500).json({ message: 'Lỗi server' });
   }
 };
