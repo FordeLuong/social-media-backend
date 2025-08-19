@@ -37,6 +37,8 @@ exports.createPost = async (req, res) => {
 // @route   POST /api/posts/image
 // @access  Private
 exports.createPostWithImage = async (req, res) => {
+  onsole.log("req.file:", req.file);
+  console.log("req.body:", req.body);
   try {
     const { content } = req.body;
     const imageUrl = req.file.path; // Đường dẫn hình ảnh từ Cloudinary
@@ -56,8 +58,7 @@ exports.createPostWithImage = async (req, res) => {
     res.status(201).json(savedPost);
   } catch (error) {
     console.error("Error in createPostWithImage:", error);
-    console.log("req.file:", req.file);
-    console.log("req.body:", req.body);
+    c
     res.status(500).json({ message: 'Lỗi server' });
   }
 };
