@@ -10,6 +10,7 @@ const {
   deletePost,       // <---
   likePost,
   commentOnPost,
+  createPostWithImage
 } = require('../controllers/postController');
 const auth = require('../middleware/auth');
 const upload = require('../config/cloudinary'); // Import middleware upload để xử lý file ảnh
@@ -23,6 +24,7 @@ router
   .get(getAllPosts)
   .post(auth, upload.any(), createPost);
 
+router.route('/image').post(auth, upload.single('image'), createPostWithImage);
 // Các route liên quan đến một bài đăng cụ thể bằng ID
 router
   .route('/:id')

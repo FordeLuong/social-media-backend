@@ -13,16 +13,13 @@ exports.createPost = async (req, res) => {
   try {
     const { content } = req.body;
 
-    const imageFile = req.files && req.files.length > 0 ? req.files[0] : null;
-    const tempimageUrl = imageFile ? imageFile.path : null;
-
     if (!content) {
       return res.status(400).json({ message: 'Nội dung không được để trống' });
     }
 
     const newPost = new Post({
       content,
-      imageUrl: tempimageUrl, // Lưu đường dẫn ảnh nếu có
+      imageUrl: null,
       author: req.user.id, // req.user được lấy từ middleware 
     });
 
@@ -32,6 +29,33 @@ exports.createPost = async (req, res) => {
     res.status(201).json(savedPost);
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+// @desc    Tạo một bài đăng mới với hình ảnh
+// @route   POST /api/posts/image
+// @access  Private
+exports.createPostWithImage = async (req, res) => {
+  try {
+    const { content } = req.body;
+    const imageUrl = req.file.path; // Đường dẫn hình ảnh từ Cloudinary
+
+    if (!imageUrl) {
+      return res.status(400).json({ message: 'Không tìm thấy file hình ảnh.' });
+    }
+
+    const newPost = new Post({
+      content: content || '',
+      imageUrl: imageUrl,
+      author: req.user.id,
+    });
+
+    const savedPost = await newPost.save();
+    await savedPost.populate('author', 'username avatar');
+    res.status(201).json(savedPost);
+  } catch (error) {
+    console.error("Error in createPostWithImage:", error);
     res.status(500).json({ message: 'Lỗi server' });
   }
 };
