@@ -13,7 +13,7 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'social_media_app', // Tên thư mục trên Cloudinary
-        allowed_formats: ['jpeg', 'png', 'jpg']
+        allowed_formats: ['jpeg', 'png', 'jpg','webp'], // Các định dạng ảnh được phép
     }
 });
 

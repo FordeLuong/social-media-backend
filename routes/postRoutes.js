@@ -13,7 +13,7 @@ const {
   createPostWithImage
 } = require('../controllers/postController');
 const auth = require('../middleware/auth');
-const upload = require('../config/cloudinary'); // Import middleware upload để xử lý file ảnh
+const upload = require('../middleware/uploadMiddleware'); // Import middleware upload để xử lý file ảnh
 
 // Các route liên quan đến bài đăng
 // GET /api/posts -> Lấy tất cả bài đăng (Công khai)
@@ -22,7 +22,7 @@ const upload = require('../config/cloudinary'); // Import middleware upload đ�
 router
   .route('/')
   .get(getAllPosts)
-  .post(auth, upload.any(), createPost);
+  .post(auth, createPost);
 
 router.route('/image').post(auth, upload.single('image'), createPostWithImage);
 // Các route liên quan đến một bài đăng cụ thể bằng ID
