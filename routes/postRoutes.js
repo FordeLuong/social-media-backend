@@ -1,16 +1,17 @@
 // routes/postRoutes.js
-
 const express = require('express');
 const router = express.Router();
 const {
   createPost,
   getAllPosts,
-  getPostById,      // <---
-  updatePost,       // <--- Các hàm mới đã được import
-  deletePost,       // <---
+  getPostById,      
+  updatePost,       
+  deletePost,       
   likePost,
   commentOnPost,
-  createPostWithImage
+  createPostWithImage,
+  getFeedPosts,
+  reactToPost       // <---
 } = require('../controllers/postController');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/uploadMiddleware'); // Import middleware upload để xử lý file ảnh
@@ -23,6 +24,10 @@ router
   .route('/')
   .get(getAllPosts)
   .post(auth, createPost);
+
+
+// GET /api/posts/feed
+router.route('/feed').get(auth, getFeedPosts);
 
 router.route('/image').post(auth, upload.single('image'), createPostWithImage);
 // Các route liên quan đến một bài đăng cụ thể bằng ID
@@ -37,5 +42,8 @@ router.route('/:id/like').put(auth, likePost);
 
 // POST /api/posts/:id/comment -> Bình luận (Cần đăng nhập)
 router.route('/:id/comment').post(auth, commentOnPost);
+
+router.route('/:id/react').post(auth, reactToPost);
+
 
 module.exports = router;

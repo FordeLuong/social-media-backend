@@ -15,6 +15,11 @@ const commentSchema = new mongoose.Schema({
         ref: 'Post',
         required: true,
     },
+    parentComment: { // ID của bình luận cha (nếu đây là một câu trả lời)
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment',
+        default: null // Mặc định là null cho các bình luận cấp 1
+    },
 }, {
     timestamps: true
 });

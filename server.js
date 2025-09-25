@@ -7,7 +7,7 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
-const { initializeSocket, getUser } = require('./socket.js');
+const { initializeSocket, getUser } = require('./socket.js'); 
 
 // --- 1. Cấu hình ban đầu ---
 dotenv.config();
@@ -49,6 +49,9 @@ app.use('/api/posts', require('./routes/postRoutes.js'));
 app.use('/api/conversations', require('./routes/conversationRoutes.js'));
 app.use('/api/messages', require('./routes/messageRoutes.js'));
 app.use('/api/notifications', require('./routes/notificationRoutes.js'));
+app.use('/api/search', require('./routes/searchRoutes.js'));
+app.use('/api/comments', require('./routes/commentRoutes.js'));
+
 
 
 // --- 6. TẠO HTTP SERVER VÀ SOCKET.IO ---

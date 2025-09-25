@@ -75,7 +75,7 @@ const loginUser = async (req, res) => {
         username: user.username,
         email: user.email,
         realName: user.realName,
-        token: generateToken(user._id), // ✅ Token mới với { id }
+        token: generateToken(user._id), //  Token mới với { id }
       });
     } else {
       res.status(401).json({ msg: 'Invalid username or password' });

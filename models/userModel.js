@@ -9,11 +9,13 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true, // Tên người dùng là duy nhất
     trim: true,
+    index: true, 
   },
   realName: {
     type: String,
     default: '',
     trim: true,
+    index: true, 
   },
   email: {
     type: String,

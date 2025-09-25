@@ -1,6 +1,7 @@
 // controllers/postController.js
 const Post = require("../models/postModel");
 const Comment = require("../models/commentModel");
+const User = require("../models/userModel");
 const { createNotification } = require('./notificationController');
 
 // ---------------------------------------------------------------- //
@@ -137,6 +138,59 @@ exports.likePost = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Lỗi server" });
   }
+};
+
+// controllers/postController.js
+
+// @desc    Thêm/thay đổi/xóa một biểu cảm trên bài đăng
+// @route   POST /api/posts/:id/react
+// @access  Private
+exports.reactToPost = async (req, res) => {
+    const { reactionType } = req.body; // Ví dụ: "like", "love", ...
+    const postId = req.params.id;
+    const userId = req.user.id;
+
+    try {
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: "Không tìm thấy bài đăng" });
+        }
+        
+        if (!post.reactions) {
+            post.reactions = [];
+        }
+
+        // Tìm xem người dùng đã react chưa
+        const existingReactionIndex = post.reactions.findIndex(
+            (reaction) => reaction.user.toString() === userId
+        );
+
+        if (existingReactionIndex > -1) {
+            // Đã react rồi
+            if (post.reactions[existingReactionIndex].type === reactionType) {
+                // Nếu click lại cùng loại reaction -> Xóa (un-react)
+                post.reactions.splice(existingReactionIndex, 1);
+            } else {
+                // Nếu click loại reaction khác -> Cập nhật
+                post.reactions[existingReactionIndex].type = reactionType;
+            }
+        } else {
+            // Chưa react -> Thêm mới
+            post.reactions.push({ user: userId, type: reactionType });
+        }
+
+        await post.save();
+
+        // Gửi thông báo nếu là reaction mới
+        if (existingReactionIndex === -1) {
+            // ... logic createNotification('reaction', ...)
+        }
+
+        res.status(200).json(post.reactions);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Lỗi server' });
+    }
 };
 
 // @desc    Bình luận vào một bài đăng
@@ -321,6 +375,82 @@ exports.getUserPosts = async (req, res) => {
     });
 
     res.status(200).json(postsWithFullUrl); // ✅ Return postsWithFullUrl
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
+
+// @desc    Lấy feed cá nhân hóa (bài đăng từ những người đang follow)
+// @route   GET /api/posts/feed
+// @access  Private
+exports.getFeedPosts = async (req, res) => {
+  try {
+    // 2. Tìm người dùng hiện tại để lấy danh sách 'following'
+    const currentUser = await User.findById(req.user.id);
+    if (!currentUser) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng." });
+    }
+
+    // 3. Lấy danh sách ID của những người mà currentUser đang theo dõi
+    // Chúng ta cũng thêm cả ID của chính currentUser vào để họ thấy bài của mình
+    const followedUserIds = [...currentUser.following, req.user.id];
+
+    // 4. Tìm tất cả các bài đăng có 'author' nằm trong danh sách ID ở trên
+    const feedPosts = await Post.find({ author: { $in: followedUserIds } })
+      .populate('author', 'username avatar')
+      .populate({
+        path: 'comments',
+        populate: { path: 'author', select: 'username avatar' },
+      })
+      .sort({ createdAt: -1 })
+      .limit(20); // Giới hạn 20 bài đăng gần nhất cho hiệu năng
+
+    // Xây dựng URL đầy đủ cho ảnh
+    const postsWithFullUrl = feedPosts.map(post => {
+      const postObject = post.toObject();
+      if (postObject.imageUrl) {
+        postObject.imageUrl = `${req.protocol}://${req.get('host')}/${postObject.imageUrl}`;
+      }
+      return postObject;
+    });
+
+    res.status(200).json(postsWithFullUrl);
+
+  } catch (error) {
+    console.error("Lỗi khi lấy feed:", error);
+    res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+exports.commentOnPost = async (req, res) => {
+  try {
+    // Lấy thêm parentCommentId từ body
+    const { content, parentCommentId } = req.body; 
+    const post = await Post.findById(req.params.id);
+
+    if (!post) { /* ... */ }
+    if (!content) { /* ... */ }
+
+    const newComment = new Comment({
+      content,
+      author: req.user.id,
+      post: req.params.id,
+      parentComment: parentCommentId || null, // Gán ID cha nếu có
+    });
+
+    const savedComment = await newComment.save();
+    
+    // Chỉ thêm các bình luận cấp 1 vào bài đăng
+    if (!parentCommentId) {
+        post.comments.push(savedComment._id);
+        await post.save();
+    }
+
+    await savedComment.populate("author", "username avatar");
+
+    // ... Tạo notification ...
+    
+    res.status(201).json(savedComment);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Lỗi server" });

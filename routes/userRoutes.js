@@ -5,6 +5,8 @@ const router = express.Router();
 const { getMe, getUserById, followUser, unfollowUser, updateUserProfile } = require('../controllers/userController.js');
 const { getUserPosts } = require('../controllers/postController.js');
 const auth = require('../middleware/auth.js');
+const upload = require('../middleware/uploadMiddleware'); // Import middleware upload để xử lý file ảnh
+
 
 // --- CÁC ROUTE TĨNH (STATIC ROUTES) 
 
@@ -15,7 +17,6 @@ router.get('/me', auth, getMe);
 // @route   PUT /api/users/profile
 // Cập nhật thông tin profile của người dùng đang đăng nhập
 router.put('/profile', auth, updateUserProfile);
-
 
 
 // --- CÁC ROUTE ĐỘNG (DYNAMIC ROUTES)
